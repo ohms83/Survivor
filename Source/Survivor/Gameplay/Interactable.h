@@ -26,8 +26,10 @@ class SURVIVOR_API IInteractable
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, meta=(Category="Interactable"))
 	void Interact();
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, meta=(Category="Interactable"))
-	void ShowInstruction(bool bVisible);
+	/**
+	 * Set whether this actor is interact-able. The Interact function should do nothing
+     * if this is set to @c false. 
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, meta=(Category="Interactable"))
 	void SetIsInteractable(bool bEnable);
 	/**

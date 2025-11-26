@@ -20,6 +20,9 @@ public:
 	// Sets default values for this actor's properties
 	AInteractableObject();
 
+	UFUNCTION(Blueprintable)
+	void ShowInstruction(bool bVisible);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -27,14 +30,13 @@ protected:
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 	virtual void NotifyActorEndOverlap(AActor* OtherActor) override;
 
-	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	bool bCanInteract = true;
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 protected:
+	bool IsActorInteractable(const AActor* OtherActor) const;
+
 	UPROPERTY(EditDefaultsOnly, meta = (Category="Interaction"))
 	UTextRenderComponent* Instruction = nullptr;
 	UPROPERTY(EditDefaultsOnly, meta = (Category="Interaction"))
@@ -47,11 +49,10 @@ protected:
 
 private:
 	virtual void Interact_Implementation() override;
-	virtual void ShowInstruction_Implementation(bool bVisible) override;
 
 	virtual void SetIsInteractable_Implementation(const bool bEnable) override
 	{
-		bCanInteract = bEnable;
+		bIsInteractable = bEnable;
 	}
 	
 	virtual bool IsInteractable_Implementation() override
@@ -71,4 +72,9 @@ private:
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(Category="Interaction", AllowPrivateAccess=true))
 	FName InputAction;
+	/**
+	 * Only actors with the following tags can interact with this object. 
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(Category="Interaction", AllowPrivateAccess=true))
+	TArray<FName> InteractorTags;
 };

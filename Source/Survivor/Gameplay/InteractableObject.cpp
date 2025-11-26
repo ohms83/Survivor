@@ -29,14 +29,19 @@ void AInteractableObject::BeginPlay()
 void AInteractableObject::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
+
+	if (!IsActorInteractable(OtherActor)) return;
+
+	Instruction->SetVisibility(true);
 }
 
 void AInteractableObject::NotifyActorEndOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorEndOverlap(OtherActor);
 
-	UE_LOG(LogTemp, Display, TEXT("AInteractableObject::NotifyActorEndOverlap. OtherActor=%s"), *OtherActor->GetName());
-	ShowInstruction(false);
+	if (!IsActorInteractable(OtherActor)) return;
+
+	Instruction->SetVisibility(false);
 }
 
 void AInteractableObject::Interact_Implementation()
@@ -46,7 +51,7 @@ void AInteractableObject::Interact_Implementation()
 	InteractionWidget->AddToViewport();
 }
 
-void AInteractableObject::ShowInstruction_Implementation(bool bVisible)
+void AInteractableObject::ShowInstruction(bool bVisible)
 {
 	if (IsInteractable() && IsValid(Instruction)) Instruction->SetVisibility(bVisible);
 }
@@ -56,5 +61,14 @@ void AInteractableObject::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+bool AInteractableObject::IsActorInteractable(const AActor* OtherActor) const
+{
+	for (const auto& Tag : OtherActor->Tags)
+	{
+		if (InteractorTags.Contains(Tag)) return true;
+	}
+	return false;
 }
 
