@@ -20,7 +20,7 @@ public class Survivor : ModuleRules
 			"GameplayStateTreeModule",
 			"Niagara",
 			"UMG",
-			"Slate"
+			"Slate",
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
