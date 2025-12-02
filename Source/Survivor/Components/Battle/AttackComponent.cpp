@@ -4,8 +4,6 @@
 #include "Components/Battle/AttackComponent.h"
 
 #include "GameFramework/Character.h"
-#include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h"
 
 DEFINE_LOG_CATEGORY(LogAttackComponent);
 
@@ -27,20 +25,6 @@ void UAttackComponent::BeginPlay()
 	OwnerCharacter = Cast<ACharacter>(GetOwner());
 	// The owner must be a character.
 	check(OwnerCharacter);
-
-	// ...
-	const auto* PlayerController = Cast<APlayerController>(OwnerCharacter->GetController());
-	if (!PlayerController) return;
-
-	InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
-	if (!InputSubsystem) return;
-	
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
-	{
-		// Bind the Aim Action to be triggered when pressed/released
-		UE_LOG(LogAttackComponent, Log, TEXT("Binding attack inputs"));
-		EnhancedInputComponent->BindAction(AttackAction.Get(), ETriggerEvent::Started, this, &UAttackComponent::HandleAttackInput);
-	}
 }
 
 void UAttackComponent::PlayAttackMontage(const int32 Index)
@@ -60,12 +44,6 @@ void UAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
-}
-
-void UAttackComponent::HandleAttackInput(const FInputActionValue& Value)
-{
-	UE_LOG(LogAttackComponent, Log, TEXT("Handle attack input"));
-	PerformAttack();
 }
 
 void UAttackComponent::PerformAttack()

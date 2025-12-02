@@ -21,12 +21,6 @@ public:
 	// Sets default values for this component's properties
 	UAttackComponent();
 
-	/**
-	 * Attack input handler.
-	 * @param Value 
-	 */
-	UFUNCTION(BlueprintCallable, Category=Attack)
-	void HandleAttackInput(const FInputActionValue& Value);
 	UFUNCTION(BlueprintCallable, Category=Attack)
 	void PerformAttack();
 	/**
@@ -38,8 +32,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category=Attack)
 	void ResetCombo();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Attack|Input")
-	TSoftObjectPtr<UInputAction> AttackAction;
 	// Combo attack montages
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Attack|Animation")
 	TArray<TSoftObjectPtr<UAnimMontage>> ComboAttacks;
@@ -66,8 +58,6 @@ private:
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess=true))
 	int32 ComboCount = 0;
 
-	UPROPERTY()
-	UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
 	UPROPERTY()
 	ACharacter* OwnerCharacter = nullptr;
 };

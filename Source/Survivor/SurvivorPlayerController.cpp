@@ -3,15 +3,14 @@
 #include "SurvivorPlayerController.h"
 #include "GameFramework/Pawn.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
-#include "SurvivorCharacter.h"
 #include "Engine/World.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "Survivor.h"
+#include "Components/Battle/AttackComponent.h"
 
 ASurvivorPlayerController::ASurvivorPlayerController()
 {
@@ -42,17 +41,14 @@ void ASurvivorPlayerController::SetupInputComponent()
 		// Set up action bindings
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 		{
-			// Setup mouse input events
-			EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Started, this, &ASurvivorPlayerController::OnInputStarted);
-			EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Triggered, this, &ASurvivorPlayerController::OnSetDestinationTriggered);
-			EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Completed, this, &ASurvivorPlayerController::OnSetDestinationReleased);
-			EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Canceled, this, &ASurvivorPlayerController::OnSetDestinationReleased);
+			// Setup click/touch input events
+			EnhancedInputComponent->BindAction(SetDestinationAction, ETriggerEvent::Started, this, &ASurvivorPlayerController::HandleSetDestinationStarted);
+			EnhancedInputComponent->BindAction(SetDestinationAction, ETriggerEvent::Triggered, this, &ASurvivorPlayerController::HandleSetDestinationTriggered);
+			EnhancedInputComponent->BindAction(SetDestinationAction, ETriggerEvent::Completed, this, &ASurvivorPlayerController::HandleSetDestinationReleased);
+			EnhancedInputComponent->BindAction(SetDestinationAction, ETriggerEvent::Canceled, this, &ASurvivorPlayerController::HandleSetDestinationReleased);
 
-			// Setup touch input events
-			EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Started, this, &ASurvivorPlayerController::OnInputStarted);
-			EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Triggered, this, &ASurvivorPlayerController::OnTouchTriggered);
-			EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Completed, this, &ASurvivorPlayerController::OnTouchReleased);
-			EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Canceled, this, &ASurvivorPlayerController::OnTouchReleased);
+			// Setup attack input events
+			EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &ASurvivorPlayerController::HandleAttackStarted);
 		}
 		else
 		{
@@ -61,26 +57,38 @@ void ASurvivorPlayerController::SetupInputComponent()
 	}
 }
 
-void ASurvivorPlayerController::OnInputStarted()
+void ASurvivorPlayerController::HandleAttackStarted()
 {
+	const auto PlayerController = Cast<APawn>(GetPawn());
+	if (!PlayerController) return;
+
+	auto AttackComponent = PlayerController->GetComponentByClass<UAttackComponent>();
+	if (!AttackComponent) return;
+
+	AttackComponent->PerformAttack();
+}
+
+void ASurvivorPlayerController::HandleSetDestinationStarted(const FInputActionValue& InputValue)
+{
+	if (InputValue.GetMagnitude() > 1.0f) bIsTouch = true;
 	StopMovement();
 }
 
-void ASurvivorPlayerController::OnSetDestinationTriggered()
+void ASurvivorPlayerController::HandleSetDestinationTriggered()
 {
 	// We flag that the input is being pressed
 	FollowTime += GetWorld()->GetDeltaSeconds();
 	
 	// We look for the location in the world where the player has pressed the input
 	FHitResult Hit;
-	bool bHitSuccessful = false;
+	bool bHitSuccessful;
 	if (bIsTouch)
 	{
-		bHitSuccessful = GetHitResultUnderFinger(ETouchIndex::Touch1, ECollisionChannel::ECC_Visibility, true, Hit);
+		bHitSuccessful = GetHitResultUnderFinger(ETouchIndex::Touch1, ECC_Visibility, true, Hit);
 	}
 	else
 	{
-		bHitSuccessful = GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, Hit);
+		bHitSuccessful = GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 	}
 
 	// If we hit a surface, cache the location
@@ -90,36 +98,31 @@ void ASurvivorPlayerController::OnSetDestinationTriggered()
 	}
 	
 	// Move towards mouse pointer or touch
-	APawn* ControlledPawn = GetPawn();
-	if (ControlledPawn != nullptr)
+	if (APawn* ControlledPawn = GetPawn(); ControlledPawn != nullptr)
 	{
-		FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
+		const FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
 		ControlledPawn->AddMovementInput(WorldDirection, 1.0, false);
 	}
 }
 
-void ASurvivorPlayerController::OnSetDestinationReleased()
+void ASurvivorPlayerController::HandleSetDestinationReleased()
 {
 	// If it was a short press
 	if (FollowTime <= ShortPressThreshold)
 	{
 		// We move there and spawn some particles
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CachedDestination);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			this,
+			FXCursor,
+			CachedDestination,
+			FRotator::ZeroRotator,
+			FVector(1.f, 1.f, 1.f),
+			true, true,
+			ENCPoolMethod::None,
+			true);
 	}
 
 	FollowTime = 0.f;
-}
-
-// Triggered every frame when the input is held down
-void ASurvivorPlayerController::OnTouchTriggered()
-{
-	bIsTouch = true;
-	OnSetDestinationTriggered();
-}
-
-void ASurvivorPlayerController::OnTouchReleased()
-{
 	bIsTouch = false;
-	OnSetDestinationReleased();
 }

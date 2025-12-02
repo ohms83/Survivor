@@ -10,6 +10,7 @@
 class UNiagaraSystem;
 class UInputMappingContext;
 class UInputAction;
+struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -26,23 +27,23 @@ protected:
 
 	/** Time Threshold to know if it was a short press */
 	UPROPERTY(EditAnywhere, Category="Input")
-	float ShortPressThreshold;
+	float ShortPressThreshold = 0.3f;
 
 	/** FX Class that we will spawn when clicking */
 	UPROPERTY(EditAnywhere, Category="Input")
-	UNiagaraSystem* FXCursor;
+	UNiagaraSystem* FXCursor = nullptr;
 
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, Category="Input")
-	UInputMappingContext* DefaultMappingContext;
+	UInputMappingContext* DefaultMappingContext = nullptr;
 	
-	/** Jump Input Action */
+	/** Click to move Input Action */
 	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* SetDestinationClickAction;
+	UInputAction* SetDestinationAction = nullptr;
 
-	/** Jump Input Action */
+	/** Attack Input Action */
 	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* SetDestinationTouchAction;
+	UInputAction* AttackAction = nullptr;
 
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
@@ -67,12 +68,10 @@ protected:
 	virtual void SetupInputComponent() override;
 	
 	/** Input handlers */
-	void OnInputStarted();
-	void OnSetDestinationTriggered();
-	void OnSetDestinationReleased();
-	void OnTouchTriggered();
-	void OnTouchReleased();
-
+	void HandleAttackStarted();
+	void HandleSetDestinationStarted(const FInputActionValue& InputValue);
+	void HandleSetDestinationTriggered();
+	void HandleSetDestinationReleased();
 };
 
 
