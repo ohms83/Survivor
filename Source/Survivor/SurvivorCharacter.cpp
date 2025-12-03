@@ -1,16 +1,20 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "SurvivorCharacter.h"
+
+#include "AbilitySystemComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Camera/CameraComponent.h"
-#include "Components/DecalComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/CommandComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Gameplay/Character/Attribute/BaseAttributes.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+
+DEFINE_LOG_CATEGORY(LogSurvivorCharacter);
 
 ASurvivorCharacter::ASurvivorCharacter()
 {
@@ -45,6 +49,8 @@ ASurvivorCharacter::ASurvivorCharacter()
 
 	CommandComponent = CreateDefaultSubobject<UCommandComponent>(TEXT("CommandComponent"));
 
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
@@ -53,8 +59,17 @@ ASurvivorCharacter::ASurvivorCharacter()
 void ASurvivorCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	if (IsValid(AbilitySystemComponent))
+	{
+		BaseAttributes = AbilitySystemComponent->GetSet<UBaseAttributes>();
+		check(BaseAttributes);
+	}
+}
 
-	// stub
+void ASurvivorCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
 }
 
 void ASurvivorCharacter::Tick(float DeltaSeconds)

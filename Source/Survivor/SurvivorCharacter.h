@@ -4,30 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "AbilitySystemInterface.h"
 #include "SurvivorCharacter.generated.h"
+
+class UBaseAttributes;
+class UCameraComponent;
+class USpringArmComponent;
+class UCommandComponent;
+
+DECLARE_LOG_CATEGORY_EXTERN(LogSurvivorCharacter, Display, All);
 
 /**
  *  A controllable top-down perspective character
  */
 UCLASS(abstract)
-class ASurvivorCharacter : public ACharacter
+class ASurvivorCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
-
-private:
-
-	/** Top down camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* TopDownCameraComponent;
-
-	/** Camera boom positioning the camera above the character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
-	
-
-	/** Camera boom positioning the camera above the character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	class UCommandComponent* CommandComponent;
 
 public:
 
@@ -36,6 +29,8 @@ public:
 
 	/** Initialization */
 	virtual void BeginPlay() override;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	/** Update */
 	virtual void Tick(float DeltaSeconds) override;
@@ -46,5 +41,35 @@ public:
 	/** Returns the Camera Boom component **/
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
+	/**
+	 * Returns the Ability System component
+	 */
+	FORCEINLINE virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override
+	{
+		return AbilitySystemComponent;
+	}
+	
+	UFUNCTION(BlueprintGetter)
+	const UBaseAttributes* GetBaseAttributes() const { return BaseAttributes; };
+
+private:
+	/** Top down camera */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* TopDownCameraComponent = nullptr;
+
+	/** Camera boom positioning the camera above the character */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* CameraBoom = nullptr;
+
+	/** Camera boom positioning the camera above the character */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	UCommandComponent* CommandComponent = nullptr;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	UAbilitySystemComponent* AbilitySystemComponent = nullptr;
+
+	/** Base character's attribute Set. */
+	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter=GetBaseAttributes, BlueprintReadOnly, Category="Attribute", meta = (AllowPrivateAccess = "true"))
+	const UBaseAttributes* BaseAttributes = nullptr;
 };
 

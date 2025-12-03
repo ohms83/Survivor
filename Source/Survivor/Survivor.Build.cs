@@ -8,7 +8,7 @@ public class Survivor : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] {
+		PublicDependencyModuleNames.AddRange([
 			"Core",
 			"CoreUObject",
 			"Engine",
@@ -20,12 +20,14 @@ public class Survivor : ModuleRules
 			"GameplayStateTreeModule",
 			"Niagara",
 			"UMG",
-			"Slate",
-		});
+			"Slate"
+		]);
 
-		PrivateDependencyModuleNames.AddRange(new string[] { });
+		PrivateDependencyModuleNames.AddRange([
+			"GameplayAbilities",
+		]);
 
-		PublicIncludePaths.AddRange(new string[] {
+		PublicIncludePaths.AddRange([
 			"Survivor",
 			"Survivor/Variant_Strategy",
 			"Survivor/Variant_Strategy/UI",
@@ -33,7 +35,7 @@ public class Survivor : ModuleRules
 			"Survivor/Variant_TwinStick/AI",
 			"Survivor/Variant_TwinStick/Gameplay",
 			"Survivor/Variant_TwinStick/UI"
-		});
+		]);
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
