@@ -25,17 +25,22 @@ void UAttackComponent::BeginPlay()
 	OwnerCharacter = Cast<ACharacter>(GetOwner());
 	// The owner must be a character.
 	check(OwnerCharacter);
+
+	(void)AttackDataAsset.LoadSynchronous();
 }
 
 void UAttackComponent::PlayAttackMontage(const int32 Index)
 {
+	const auto& ComboAttacks = AttackDataAsset->AttackAnimations;
 	if (ComboAttacks.IsEmpty() || !ComboAttacks.IsValidIndex(Index))
 	{
 		UE_LOG(LogAttackComponent, Warning, TEXT("Invalid anim montage index. Index=%d Num Montage=%d"),
 			Index, ComboAttacks.Num());
 		return;
 	}
-	OwnerCharacter->PlayAnimMontage(ComboAttacks[Index].Get());
+	check(ComboAttacks[Index].Montage);
+	const auto& [Montage, AnimSpeed] = ComboAttacks[Index];
+	OwnerCharacter->PlayAnimMontage(Montage, AnimSpeed);
 }
 
 // Called every frame
@@ -59,7 +64,7 @@ void UAttackComponent::PerformAttack()
 	bIsAttacking = true;
 
 	PlayAttackMontage(ComboCount++);
-	if (!ComboAttacks.IsValidIndex(ComboCount)) ComboCount = 0;
+	if (!AttackDataAsset->AttackAnimations.IsValidIndex(ComboCount)) ComboCount = 0;
 }
 
 void UAttackComponent::ExecuteSavedAttack()

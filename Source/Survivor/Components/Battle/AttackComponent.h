@@ -12,6 +12,26 @@ struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogAttackComponent, Log, All);
 
+USTRUCT(Blueprintable, BlueprintType)
+struct FAttackAnimData
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* Montage;
+	UPROPERTY(EditAnywhere)
+	float AnimSpeed = 1.0f;	
+};
+
+UCLASS(BlueprintType)
+class UAttackDataAsset : public UDataAsset
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	TArray<FAttackAnimData> AttackAnimations;
+};
+
 UCLASS( ClassGroup=("Gameplay/Battle"), meta=(BlueprintSpawnableComponent) )
 class SURVIVOR_API UAttackComponent : public UActorComponent
 {
@@ -32,9 +52,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category=Attack)
 	void ResetCombo();
 
-	// Combo attack montages
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Attack|Animation")
-	TArray<TSoftObjectPtr<UAnimMontage>> ComboAttacks;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attack")
+	TSoftObjectPtr<UAttackDataAsset> AttackDataAsset;
 
 protected:
 	// Called when the game starts
