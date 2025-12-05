@@ -4,13 +4,23 @@
 #include "Gameplay/Character/Attribute/BaseAttributes.h"
 #include "GameplayEffectExtension.h"
 
-void UBaseAttributes::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
-{
-	Super::PostGameplayEffectExecute(Data);// Check if the modified attribute was Health
+DEFINE_LOG_CATEGORY(LogBaseGameplayAttribute);
 
-	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+void UBaseAttributes::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
+{
+	Super::PreAttributeBaseChange(Attribute, NewValue);
+
+	if (Attribute == GetHealthAttribute())
 	{
 		// Clamp Health between 0 and MaxHealth
-		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
+		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHealth());
 	}
+}
+
+void UBaseAttributes::PostAttributeChange(const FGameplayAttribute& Attribute, const float OldValue, const float NewValue)
+{
+	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+
+	UE_LOG(LogBaseGameplayAttribute, Log, TEXT("Attribute '%s' value changed. Old=%.3f New=%.3f"),
+		*Attribute.GetName(), OldValue, NewValue);
 }

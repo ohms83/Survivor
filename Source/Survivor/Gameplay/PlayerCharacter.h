@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "SurvivorCharacter.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
-class SURVIVOR_API APlayerCharacter : public ACharacter
+class SURVIVOR_API APlayerCharacter : public ASurvivorCharacter
 {
 	GENERATED_BODY()
 

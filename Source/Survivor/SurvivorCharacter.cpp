@@ -7,6 +7,8 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/CommandComponent.h"
+#include "Components/Battle/AttackComponent.h"
+#include "Components/Battle/DamageComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -47,9 +49,13 @@ ASurvivorCharacter::ASurvivorCharacter()
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false;
 
-	CommandComponent = CreateDefaultSubobject<UCommandComponent>(TEXT("CommandComponent"));
-
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UBaseAttributes::GetHealthAttribute())
+		.AddUObject(this, &ThisClass::OnAttributeChanged);
+	
+	CommandComponent = CreateDefaultSubobject<UCommandComponent>(TEXT("CommandComponent"));
+	AttackComponent = CreateDefaultSubobject<UAttackComponent>(TEXT("AttackComponent"));
+	DamageComponent = CreateDefaultSubobject<UDamageComponent>(TEXT("DamageComponent"));
 
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
@@ -77,4 +83,13 @@ void ASurvivorCharacter::Tick(float DeltaSeconds)
     Super::Tick(DeltaSeconds);
 
 	// stub
+}
+
+void ASurvivorCharacter::OnAttributeChanged(const FOnAttributeChangeData& AttributeChangeData)
+{
+	EventBaseAttributeChangedDelegate.Broadcast( {
+		AttributeChangeData.Attribute.GetName(),
+		AttributeChangeData.NewValue,
+		AttributeChangeData.OldValue
+	});
 }

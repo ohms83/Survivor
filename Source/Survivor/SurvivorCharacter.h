@@ -5,25 +5,42 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "Gameplay/Character/Attribute/BaseAttributes.h"
 #include "SurvivorCharacter.generated.h"
 
 class UBaseAttributes;
 class UCameraComponent;
 class USpringArmComponent;
 class UCommandComponent;
+class UAttackComponent;
+class UDamageComponent;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogSurvivorCharacter, Display, All);
+
+USTRUCT(BlueprintType)
+struct FAttributeChangeData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString AttributeName;
+	UPROPERTY(BlueprintReadWrite)
+	float NewValue = 0;
+	UPROPERTY(BlueprintReadWrite)
+	float OldValue = 0;
+};
+    
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeValueChange, const FAttributeChangeData&, AttributeChangeData);
 
 /**
  *  A controllable top-down perspective character
  */
-UCLASS(abstract)
+UCLASS(Abstract)
 class ASurvivorCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 public:
-
 	/** Constructor */
 	ASurvivorCharacter();
 
@@ -52,7 +69,17 @@ public:
 	UFUNCTION(BlueprintGetter)
 	const UBaseAttributes* GetBaseAttributes() const { return BaseAttributes; };
 
+	UPROPERTY(BlueprintAssignable, Category="Attribute")
+	FOnAttributeValueChange EventBaseAttributeChangedDelegate;
+
+protected:
+	virtual void OnAttributeChanged(const FOnAttributeChangeData& AttributeChangeData);
+
 private:
+	/** Base character's attribute Set. */
+	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter=GetBaseAttributes, BlueprintReadOnly, Category="Attribute", meta = (AllowPrivateAccess = "true"))
+	const UBaseAttributes* BaseAttributes = nullptr;
+
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* TopDownCameraComponent = nullptr;
@@ -68,8 +95,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UAbilitySystemComponent* AbilitySystemComponent = nullptr;
 
-	/** Base character's attribute Set. */
-	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter=GetBaseAttributes, BlueprintReadOnly, Category="Attribute", meta = (AllowPrivateAccess = "true"))
-	const UBaseAttributes* BaseAttributes = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	UAttackComponent* AttackComponent = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	UDamageComponent* DamageComponent = nullptr;
 };
 

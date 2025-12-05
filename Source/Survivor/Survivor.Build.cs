@@ -25,6 +25,7 @@ public class Survivor : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange([
 			"GameplayAbilities",
+			"GameplayTags",
 		]);
 
 		PublicIncludePaths.AddRange([

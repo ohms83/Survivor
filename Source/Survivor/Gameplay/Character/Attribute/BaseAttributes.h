@@ -7,6 +7,8 @@
 #include "AbilitySystemComponent.h"
 #include "BaseAttributes.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogBaseGameplayAttribute, Log, All);
+
 /**
  * Character's base attributes.
  */
@@ -18,7 +20,8 @@ public:
 	ATTRIBUTE_ACCESSORS_BASIC(UBaseAttributes, Health);
 	ATTRIBUTE_ACCESSORS_BASIC(UBaseAttributes, MaxHealth);
 
-	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;;
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayAttributeData Health;
