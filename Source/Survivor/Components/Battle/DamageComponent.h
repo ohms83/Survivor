@@ -20,7 +20,7 @@ struct FDamageInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor* Receiver = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Damage;
+	float Damage = 0;
 	// TODO: More useful information, eg., critical flag.
 };
 
