@@ -3,6 +3,7 @@
 
 #include "Components/Battle/AttackComponent.h"
 
+#include "TargetComponent.h"
 #include "GameFramework/Character.h"
 
 DEFINE_LOG_CATEGORY(LogAttackComponent);
@@ -25,6 +26,13 @@ void UAttackComponent::BeginPlay()
 	OwnerCharacter = Cast<ACharacter>(GetOwner());
 	// The owner must be a character.
 	check(OwnerCharacter);
+
+	TargetComponent = Cast<UTargetComponent>(OwnerCharacter->FindComponentByClass<UTargetComponent>());
+	if (!TargetComponent)
+	{
+		UE_LOG(LogAttackComponent, Warning, TEXT("Character %s doesn't have a Target Component!"),
+			*OwnerCharacter->GetName());
+	}
 
 	(void)AttackDataAsset.LoadSynchronous();
 }
@@ -49,10 +57,20 @@ void UAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+	if (!bAutoAttack || !IsValid(TargetComponent) || bSavedAttack) return;
+
+	// TODO: Make target select type to be configurable.
+	const auto Target = TargetComponent->SelectTarget(ETargetSelectType::First);
+	if (!IsValid(Target)) return;
+
+	PerformAttack();
 }
 
 void UAttackComponent::PerformAttack()
 {
+	// Another attack was already queued.
+	if (bSavedAttack) return;
+
 	if (bIsAttacking)
 	{
 		// Save the attack command to be executed when receiving the anim notify event.

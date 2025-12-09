@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "AttackComponent.generated.h"
 
+class UTargetComponent;
 class UInputAction;
 class UEnhancedInputLocalPlayerSubsystem;
 struct FInputActionValue;
@@ -18,7 +19,7 @@ struct FAttackAnimData
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere)
-	UAnimMontage* Montage;
+	UAnimMontage* Montage = nullptr;
 	UPROPERTY(EditAnywhere)
 	float AnimSpeed = 1.0f;	
 };
@@ -37,7 +38,7 @@ class SURVIVOR_API UAttackComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
 	UAttackComponent();
 
@@ -54,6 +55,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attack")
 	TSoftObjectPtr<UAttackDataAsset> AttackDataAsset;
+	/**
+	 * If set, the component will automatically attack any nearby targets.
+	 * @note TargetComponent is required.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attack")
+	bool bAutoAttack = true;
 
 protected:
 	// Called when the game starts
@@ -79,4 +86,6 @@ private:
 
 	UPROPERTY()
 	ACharacter* OwnerCharacter = nullptr;
+	UPROPERTY()
+	UTargetComponent* TargetComponent = nullptr;
 };

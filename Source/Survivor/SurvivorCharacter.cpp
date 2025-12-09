@@ -9,6 +9,7 @@
 #include "Components/CommandComponent.h"
 #include "Components/Battle/AttackComponent.h"
 #include "Components/Battle/DamageComponent.h"
+#include "Components/Battle/TargetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -56,6 +57,7 @@ ASurvivorCharacter::ASurvivorCharacter()
 	CommandComponent = CreateDefaultSubobject<UCommandComponent>(TEXT("CommandComponent"));
 	AttackComponent = CreateDefaultSubobject<UAttackComponent>(TEXT("AttackComponent"));
 	DamageComponent = CreateDefaultSubobject<UDamageComponent>(TEXT("DamageComponent"));
+	TargetComponent = CreateDefaultSubobject<UTargetComponent>(TEXT("TargetComponent"));
 
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;

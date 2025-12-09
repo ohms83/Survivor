@@ -14,6 +14,7 @@ class USpringArmComponent;
 class UCommandComponent;
 class UAttackComponent;
 class UDamageComponent;
+class UTargetComponent;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogSurvivorCharacter, Display, All);
 
@@ -83,21 +84,19 @@ private:
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* TopDownCameraComponent = nullptr;
-
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom = nullptr;
-
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCommandComponent* CommandComponent = nullptr;
-	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UAbilitySystemComponent* AbilitySystemComponent = nullptr;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UAttackComponent* AttackComponent = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UDamageComponent* DamageComponent = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	UTargetComponent* TargetComponent = nullptr;
 };
 
