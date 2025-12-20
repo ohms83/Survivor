@@ -23,4 +23,11 @@ void UBaseAttributes::PostAttributeChange(const FGameplayAttribute& Attribute, c
 
 	UE_LOG(LogBaseGameplayAttribute, Log, TEXT("Attribute '%s' value changed. Old=%.3f New=%.3f"),
 		*Attribute.GetName(), OldValue, NewValue);
+
+	const auto AttributeName = Attribute.GetName();
+
+	if (AttributeName == GetHealthAttribute().GetName()) OnHealthChanged.Broadcast(NewValue, OldValue);
+	else if (AttributeName == GetMaxHealthAttribute().GetName()) OnMaxHealthChanged.Broadcast(NewValue, OldValue);
+	else if (AttributeName == GetAttackAttribute().GetName()) OnAttackChanged.Broadcast(NewValue, OldValue);
+	else if (AttributeName == GetDefenceAttribute().GetName()) OnDefenceChanged.Broadcast(NewValue, OldValue);
 }

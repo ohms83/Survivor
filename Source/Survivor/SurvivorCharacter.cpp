@@ -16,6 +16,7 @@
 #include "Gameplay/Character/Attribute/BaseAttributes.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+#include "Gameplay/Actors/Battle/Weapon.h"
 
 DEFINE_LOG_CATEGORY(LogSurvivorCharacter);
 
@@ -66,13 +67,13 @@ ASurvivorCharacter::ASurvivorCharacter()
 
 void ASurvivorCharacter::BeginPlay()
 {
-	Super::BeginPlay();
-	
 	if (IsValid(AbilitySystemComponent))
 	{
 		BaseAttributes = AbilitySystemComponent->GetSet<UBaseAttributes>();
 		check(BaseAttributes);
 	}
+
+	Super::BeginPlay();
 }
 
 void ASurvivorCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)

@@ -17,6 +17,27 @@ UDamageComponent::UDamageComponent()
 	// ...
 }
 
+// Called when the game starts
+void UDamageComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// ...
+	if (const auto EffectClass = DamageEffectClass.Get())
+	{
+		DamageEffect = NewObject<UGameplayEffect>(GetTransientPackage(), EffectClass);
+	}
+}
+
+
+// Called every frame
+void UDamageComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	// ...
+}
+
 void UDamageComponent::Damage(float Damage, AActor* Instigator)
 {
 	if (!IsValid(DamageEffect))
@@ -36,7 +57,7 @@ void UDamageComponent::Damage(float Damage, AActor* Instigator)
 	FGameplayEffectContextHandle EffectContext = AbilityComp->MakeEffectContext();
 	// Effect causer refers to the weapon that cause this damage, but it also can be the same as instigator.
 	EffectContext.AddInstigator(Instigator, Instigator); 
-    
+
 	// Create the Effect Spec Handle 
 	FGameplayEffectSpecHandle SpecHandle = AbilityComp->MakeOutgoingSpec(
 		DamageEffectClass.Get(),	// The UGameplayEffect class (Blueprint Asset)
@@ -63,31 +84,8 @@ void UDamageComponent::Damage(float Damage, AActor* Instigator)
 		Owner,
 		Damage
 	});
-#if 0
+#if 1
 	UE_LOG(LogDamageComponent, Display, TEXT("%s received %.3f damage from %s"),
-		*Owner->GetName(), Damage, *Instigator->GetName());
+		*Owner->GetName(), Damage, Instigator ? *Instigator->GetName() : TEXT("NULL"));
 #endif
 }
-
-
-// Called when the game starts
-void UDamageComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-	if (const auto EffectClass = DamageEffectClass.Get())
-	{
-		DamageEffect = NewObject<UGameplayEffect>(GetTransientPackage(), EffectClass);
-	}
-}
-
-
-// Called every frame
-void UDamageComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-

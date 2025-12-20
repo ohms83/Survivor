@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
 #include "TargetComponent.generated.h"
 
@@ -38,6 +39,9 @@ public:
 	//! Select multiple targets from the list.
 	UFUNCTION(BlueprintCallable, Category="Targetting")
 	bool SelectMultiTarget(ETargetSelectType SelectType, int32 NumTarget, TArray<AActor*>& OutTargets);
+	//! Determined whether the specified actor can't be selected as a target.
+	UFUNCTION(BlueprintCallable, Category="Targetting")
+	bool CanBeTarget(const AActor* OtherActor) const;
 
 protected:
 	// Called when the game starts
@@ -51,11 +55,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Targetting")
 	float TargetRange = 300.f;
-	/**
-	 * Enemy tags list. The component will only react to those actors with these tags.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Targetting")
-	TArray<FName> EnemyTags;
+
+	// The tags an actor must have to be targeted.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Targetting")
+	FGameplayTagContainer RequiredTags;
 
 	UPROPERTY(BlueprintAssignable, Category="Targetting")
 	FTargetListUpdatedDelegate EventTargetAdded;
@@ -77,8 +80,6 @@ private:
 	void OnTargetExited(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	AActor* FindClosetTarget(const TArray<AActor*>& TargetList) const;
-	//! Check whether the specified actor contains any of a tag in the tag list.  
-	static bool ContainsTag(AActor* Actor, const TArray<FName>& TagList);
 
 	UPROPERTY()
 	TArray<AActor*> TargetActors;

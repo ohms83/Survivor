@@ -39,6 +39,12 @@ void UAttackComponent::BeginPlay()
 
 void UAttackComponent::PlayAttackMontage(const int32 Index)
 {
+	if (!AttackDataAsset)
+	{
+		UE_LOG(LogAttackComponent, Error, TEXT("Invalid AttackDataAsset!"));
+		return;
+	}
+
 	const auto& ComboAttacks = AttackDataAsset->AttackAnimations;
 	if (ComboAttacks.IsEmpty() || !ComboAttacks.IsValidIndex(Index))
 	{
@@ -82,6 +88,13 @@ void UAttackComponent::PerformAttack()
 	bIsAttacking = true;
 
 	PlayAttackMontage(ComboCount++);
+	
+	if (!AttackDataAsset)
+	{
+		UE_LOG(LogAttackComponent, Error, TEXT("Invalid AttackDataAsset!"));
+		return;
+	}
+
 	if (!AttackDataAsset->AttackAnimations.IsValidIndex(ComboCount)) ComboCount = 0;
 }
 

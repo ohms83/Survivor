@@ -2,6 +2,8 @@
 
 
 #include "Components/Battle/TargetComponent.h"
+
+#include "GameplayTagAssetInterface.h"
 #include "Components/SphereComponent.h"
 
 #if !UE_BUILD_SHIPPING
@@ -21,14 +23,14 @@ UTargetComponent::UTargetComponent()
 	auto Owner = GetOwner();
 	if (!IsValid(Owner)) return; // Just skip.
 
-	auto SphereComponent = NewObject<USphereComponent>(Owner, TEXT("Target Trigger"));
-	check(SphereComponent);
-
-	SphereComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-	SphereComponent->SetGenerateOverlapEvents(true);
-	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnTargetEntered);
-	SphereComponent->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnTargetExited);
-	TargetRadius = SphereComponent;
+	if (auto SphereComponent = NewObject<USphereComponent>(Owner, TEXT("Target Trigger")))
+	{
+		SphereComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+		SphereComponent->SetGenerateOverlapEvents(true);
+		SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnTargetEntered);
+		SphereComponent->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnTargetExited);
+		TargetRadius = SphereComponent;
+	}
 }
 
 // Called when the game starts
@@ -113,28 +115,44 @@ bool UTargetComponent::SelectMultiTarget(ETargetSelectType SelectType, int32 Num
 	return false;
 }
 
+bool UTargetComponent::CanBeTarget(const AActor* OtherActor) const
+{
+	if (!OtherActor || OtherActor == GetOwner()) return false;
+
+	// Check if the Actor implements the Gameplay Tag Interface
+	if (const IGameplayTagAssetInterface* TagInterface = Cast<IGameplayTagAssetInterface>(OtherActor))
+	{
+		FGameplayTagContainer OwnedTags;
+		TagInterface->GetOwnedGameplayTags(OwnedTags);
+
+		// Check whether the other actor has all the required tags.
+		return OwnedTags.HasAll(RequiredTags);
+	}
+	return false;
+}
+
 void UTargetComponent::OnTargetEntered(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                       UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	UE_LOG(LogTargetComponent, Display, TEXT("Overlapping OtherActor=%s"), *OtherActor->GetName());
-	if (ContainsTag(OtherActor, EnemyTags))
-	{
-		TargetActors.AddUnique(OtherActor);
-		EventTargetAdded.Broadcast(OtherActor);
-		UE_LOG(LogTargetComponent, Display, TEXT("Target Added. Target=%s"), *OtherActor->GetName());
-	}
+
+	if (!CanBeTarget(OtherActor)) return;
+
+	TargetActors.AddUnique(OtherActor);
+	EventTargetAdded.Broadcast(OtherActor);
+	UE_LOG(LogTargetComponent, Display, TEXT("Target Added. Target=%s"), *OtherActor->GetName());
 }
 
 void UTargetComponent::OnTargetExited(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	UE_LOG(LogTargetComponent, Display, TEXT("End overlapping OtherActor=%s"), *OtherActor->GetName());
-	if (ContainsTag(OtherActor, EnemyTags))
-	{
-		TargetActors.Remove(OtherActor);
-		EventTargetRemoved.Broadcast(OtherActor);
-		UE_LOG(LogTargetComponent, Display, TEXT("Target Removed. Target=%s"), *OtherActor->GetName());
-	}
+
+	if (!CanBeTarget(OtherActor)) return;
+
+	TargetActors.Remove(OtherActor);
+	EventTargetRemoved.Broadcast(OtherActor);
+	UE_LOG(LogTargetComponent, Display, TEXT("Target Removed. Target=%s"), *OtherActor->GetName());
 }
 
 AActor* UTargetComponent::FindClosetTarget(const TArray<AActor*>& TargetList) const
@@ -154,13 +172,3 @@ AActor* UTargetComponent::FindClosetTarget(const TArray<AActor*>& TargetList) co
 
 	return ClosestTarget;
 }
-
-bool UTargetComponent::ContainsTag(AActor* Actor, const TArray<FName>& TagList)
-{
-	for (const auto Tag : Actor->Tags)
-	{
-		if (TagList.Contains(Tag)) return true;
-	}
-	return false;
-}
-

@@ -5,9 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "Gameplay/Character/Attribute/AttributeHolder.h"
 #include "Gameplay/Character/Attribute/BaseAttributes.h"
 #include "SurvivorCharacter.generated.h"
 
+class AWeapon;
 class UBaseAttributes;
 class UCameraComponent;
 class USpringArmComponent;
@@ -37,7 +39,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeValueChange, const FAttr
  *  A controllable top-down perspective character
  */
 UCLASS(Abstract)
-class ASurvivorCharacter : public ACharacter, public IAbilitySystemInterface
+class ASurvivorCharacter : public ACharacter, public IAbilitySystemInterface, public IAttributeHolder, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
 
@@ -66,9 +68,20 @@ public:
 	{
 		return AbilitySystemComponent;
 	}
+
+	FORCEINLINE virtual const UBaseAttributes* GetBaseAttributes_Implementation() const override
+	{
+		return BaseAttributes;
+	}
 	
-	UFUNCTION(BlueprintGetter)
-	const UBaseAttributes* GetBaseAttributes() const { return BaseAttributes; };
+	// --- IGameplayTagAssetInterface Implementation ---
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override 
+	{ 
+		TagContainer = MyTags; 
+	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay|Tags")
+	FGameplayTagContainer MyTags;
 
 	UPROPERTY(BlueprintAssignable, Category="Attribute")
 	FOnAttributeValueChange EventBaseAttributeChangedDelegate;
@@ -78,7 +91,7 @@ protected:
 
 private:
 	/** Base character's attribute Set. */
-	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter=GetBaseAttributes, BlueprintReadOnly, Category="Attribute", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Attribute", meta = (AllowPrivateAccess = "true"))
 	const UBaseAttributes* BaseAttributes = nullptr;
 
 	/** Top down camera */
