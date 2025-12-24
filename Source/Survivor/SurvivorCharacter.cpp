@@ -11,12 +11,8 @@
 #include "Components/Battle/DamageComponent.h"
 #include "Components/Battle/TargetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Gameplay/Character/Attribute/BaseAttributes.h"
-#include "Materials/Material.h"
-#include "Engine/World.h"
-#include "Gameplay/Actors/Battle/Weapon.h"
 
 DEFINE_LOG_CATEGORY(LogSurvivorCharacter);
 

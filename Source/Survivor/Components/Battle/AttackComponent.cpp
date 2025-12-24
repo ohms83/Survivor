@@ -52,9 +52,9 @@ void UAttackComponent::PlayAttackMontage(const int32 Index)
 			Index, ComboAttacks.Num());
 		return;
 	}
-	check(ComboAttacks[Index].Montage);
-	const auto& [Montage, AnimSpeed] = ComboAttacks[Index];
-	OwnerCharacter->PlayAnimMontage(Montage, AnimSpeed);
+	const auto& AttackData = ComboAttacks[Index];
+	check(AttackData.Montage);
+	OwnerCharacter->PlayAnimMontage(AttackData.Montage, AttackData.AnimSpeed);
 }
 
 // Called every frame

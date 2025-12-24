@@ -14,7 +14,7 @@ struct FInputActionValue;
 DECLARE_LOG_CATEGORY_EXTERN(LogAttackComponent, Log, All);
 
 USTRUCT(Blueprintable, BlueprintType)
-struct FAttackAnimData
+struct FAttackData
 {
 	GENERATED_BODY()
 	
@@ -22,6 +22,8 @@ struct FAttackAnimData
 	UAnimMontage* Montage = nullptr;
 	UPROPERTY(EditAnywhere)
 	float AnimSpeed = 1.0f;	
+	UPROPERTY(EditAnywhere)
+	float KnockBackMagnitude = 200.0f;	
 };
 
 UCLASS(BlueprintType)
@@ -30,7 +32,7 @@ class UAttackDataAsset : public UDataAsset
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere)
-	TArray<FAttackAnimData> AttackAnimations;
+	TArray<FAttackData> AttackAnimations;
 };
 
 UCLASS( ClassGroup=("Gameplay/Battle"), meta=(BlueprintSpawnableComponent) )
