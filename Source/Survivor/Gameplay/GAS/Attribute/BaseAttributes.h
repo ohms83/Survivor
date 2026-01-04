@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
-#include "Gameplay/GAS/Attribute/AttributeGlobal.h"
 #include "BaseAttributes.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogBaseGameplayAttribute, Log, All);

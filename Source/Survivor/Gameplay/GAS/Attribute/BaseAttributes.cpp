@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Gameplay/Character/Attribute/BaseAttributes.h"
+#include "BaseAttributes.h"
 #include "GameplayEffectExtension.h"
 
 DEFINE_LOG_CATEGORY(LogBaseGameplayAttribute);

@@ -4,8 +4,8 @@
 #include "Debug/Subsystem/DebugPlayerSubsystem.h"
 
 #include "SurvivorCharacter.h"
+#include "Gameplay/GAS/Attribute/BaseAttributes.h"
 #include "HAL/IConsoleManager.h"
-#include "Gameplay/Character/Attribute/BaseAttributes.h"
 
 DEFINE_LOG_CATEGORY(DebugPlayerSubsystem);
 
@@ -58,8 +58,11 @@ void UDebugPlayerSubsystem::PrintPlayerAttributes(const TArray<FString>& Args, U
 	const auto ControlledChar = Cast<ASurvivorCharacter>(
 		LocalPlayer->GetPlayerController(World)->GetCharacter());
 	check(ControlledChar);
-	
-	const auto BaseAttributes = ControlledChar->GetBaseAttributes();
+
+	const auto GASComp = ControlledChar->GetAbilitySystemComponent();
+	check(GASComp);
+
+	const auto BaseAttributes = GASComp->GetSet<UBaseAttributes>();
 	for (const FString& Arg : Args)
 	{
 		bool bAttributeFound = false;

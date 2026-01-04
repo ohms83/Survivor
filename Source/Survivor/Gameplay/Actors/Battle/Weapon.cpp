@@ -7,8 +7,6 @@
 #include "Components/ShapeComponent.h"
 #include "Components/Battle/DamageComponent.h"
 #include "Components/Battle/TargetComponent.h"
-#include "Gameplay/Character/Attribute/AttributeHolder.h"
-#include "Gameplay/FunctionLibrary/DamageCalculator.h"
 
 static const FName HurtBoxName = TEXT("HurtBox");
 
@@ -35,35 +33,25 @@ void AWeapon::BeginPlay()
 	{
 		HitBoxComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginHit);
 	}
-
-	if (IsValid(OwnerCharacter) && OwnerCharacter->Implements<UAttributeHolder>())
-	{
-		OwnerBaseAttributes = IAttributeHolder::Execute_GetBaseAttributes(OwnerCharacter);
-	}
-	else
-	{
-		OwnerBaseAttributes = nullptr;
-	}
 }
 
 void AWeapon::OnBeginHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!IsValid(OwnerCharacter) || !OwnerCharacter->Implements<UAttributeHolder>()) return;
+	if (!IsValid(OwnerCharacter)) return;
 	// Check whether the other actor can be a target.
 	if (const auto TargetComponent = OtherActor->GetComponentByClass<UTargetComponent>(); !TargetComponent->CanBeTarget(OwnerCharacter)) return;
 	// Check whether colliding with a hurt-box
 	if (!OtherComp->ComponentHasTag(HurtBoxName)) return;
-	// Check whether the hurt-box owner has gameplay attributes
-	if (!OtherActor->Implements<UAttributeHolder>()) return;
 
 	auto DamageComponent = OtherActor->GetComponentByClass<UDamageComponent>();
 	if (!IsValid(DamageComponent)) return;
 
-	OwnerBaseAttributes = IAttributeHolder::Execute_GetBaseAttributes(OwnerCharacter);
-	const auto OtherBaseAttributes = IAttributeHolder::Execute_GetBaseAttributes(OtherActor);
-	const auto Damage = UDamageCalculator::CalculateDamage(OwnerBaseAttributes, OtherBaseAttributes);
-	DamageComponent->Damage(Damage, OwnerCharacter);
+	// TODO: Use gameplay effect.
+	// OwnerBaseAttributes = IAttributeHolder::Execute_GetBaseAttributes(OwnerCharacter);
+	// const auto OtherBaseAttributes = IAttributeHolder::Execute_GetBaseAttributes(OtherActor);
+	// const auto Damage = UDamageCalculator::CalculateDamage(OwnerBaseAttributes, OtherBaseAttributes);
+	// DamageComponent->Damage(Damage, OwnerCharacter);
 
 	// TODO: Attack attributes
 	// DamageComponent->KnockBack(500.f, OwnerCharacter);

@@ -2,8 +2,8 @@
 
 
 #include "Gameplay/GAS/Calculation/DamageCalculation.h"
-#include "Gameplay/Character/Attribute/BaseAttributes.h"
-#include "Gameplay/Character/Attribute/BattleAttributes.h"
+#include "Gameplay/GAS/Attribute/BaseAttributes.h"
+#include "Gameplay/GAS/Attribute/BattleAttributes.h"
 
 struct FSurvivorDamageStatics
 {
