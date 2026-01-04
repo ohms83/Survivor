@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BaseAttributes.h"
+#include "BattleAttributes.h"
 #include "UObject/Interface.h"
 #include "AttributeHolder.generated.h"
 
-class UAbilitySystemComponent;
-class UBaseAttributes;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
 class UAttributeHolder : public UInterface
@@ -26,4 +26,7 @@ class SURVIVOR_API IAttributeHolder
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	const UBaseAttributes* GetBaseAttributes() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	const UBattleAttributes* GetBattleAttributes() const;
 };

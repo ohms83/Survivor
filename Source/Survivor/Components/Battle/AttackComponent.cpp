@@ -3,6 +3,8 @@
 
 #include "Components/Battle/AttackComponent.h"
 
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemInterface.h"
 #include "TargetComponent.h"
 #include "GameFramework/Character.h"
 
@@ -35,6 +37,27 @@ void UAttackComponent::BeginPlay()
 	}
 
 	(void)AttackDataAsset.LoadSynchronous();
+
+	if (!IsValid(AttackAbility.Get()))
+	{
+		UE_LOG(LogAttackComponent, Error, TEXT("Invalid Attack Ability! Character=%s"),
+			*OwnerCharacter->GetName());
+		return;
+	}
+
+	if (const auto AbilitySystemInterface = Cast<IAbilitySystemInterface>(OwnerCharacter))
+	{
+		OwnerGAS = AbilitySystemInterface->GetAbilitySystemComponent();
+		if (OwnerGAS) {
+			AttackAbilityHandle = OwnerGAS->GiveAbility(OwnerGAS->BuildAbilitySpecFromClass(AttackAbility.Get(), 0, -1));
+		}
+	}
+	else
+	{
+		UE_LOG(LogAttackComponent, Error, TEXT("Actor (%s) doesn't implement IAbilitySystemInterface or never initialized UGameplayAbilitySystemComponent."),
+			OwnerCharacter ? *OwnerCharacter->GetName() : TEXT("NULL")
+		);
+	}
 }
 
 void UAttackComponent::PlayAttackMontage(const int32 Index)
@@ -84,16 +107,25 @@ void UAttackComponent::PerformAttack()
 		bSavedAttack = true;
 		return;
 	}
-
-	bIsAttacking = true;
-
-	PlayAttackMontage(ComboCount++);
 	
 	if (!AttackDataAsset)
 	{
 		UE_LOG(LogAttackComponent, Error, TEXT("Invalid AttackDataAsset!"));
 		return;
 	}
+
+	bIsAttacking = true;
+
+	// PlayAttackMontage(ComboCount++);
+	// if (AttackAbility)
+	if (!OwnerGAS)
+	{
+		UE_LOG(LogAttackComponent, Warning, TEXT("Actor (%s) doesn't implement IAbilitySystemInterface or never initialized UGameplayAbilitySystemComponent."),
+			OwnerCharacter ? *OwnerCharacter->GetName() : TEXT("NULL")
+		);
+		return;
+	}
+	OwnerGAS->TryActivateAbility(AttackAbilityHandle);
 
 	if (!AttackDataAsset->AttackAnimations.IsValidIndex(ComboCount)) ComboCount = 0;
 }

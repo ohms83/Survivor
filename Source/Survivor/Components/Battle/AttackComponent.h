@@ -3,12 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "Components/ActorComponent.h"
 #include "AttackComponent.generated.h"
 
 class UTargetComponent;
 class UInputAction;
 class UEnhancedInputLocalPlayerSubsystem;
+class UAbilitySystemComponent;
+class UGameplayAbility;
+class UGameplayEffect;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogAttackComponent, Log, All);
@@ -21,9 +25,11 @@ struct FAttackData
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* Montage = nullptr;
 	UPROPERTY(EditAnywhere)
-	float AnimSpeed = 1.0f;	
+	float AnimSpeed = 1.0f;
 	UPROPERTY(EditAnywhere)
-	float KnockBackMagnitude = 200.0f;	
+	UGameplayEffect* DamageEffect = nullptr;
+	UPROPERTY(EditAnywhere)
+	TArray<UGameplayEffect*> Effects;
 };
 
 UCLASS(BlueprintType)
@@ -57,6 +63,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attack")
 	TSoftObjectPtr<UAttackDataAsset> AttackDataAsset;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attack")
+	TSubclassOf<UGameplayAbility> AttackAbility;
 	/**
 	 * If set, the component will automatically attack any nearby targets.
 	 * @note TargetComponent is required.
@@ -90,4 +98,8 @@ private:
 	ACharacter* OwnerCharacter = nullptr;
 	UPROPERTY()
 	UTargetComponent* TargetComponent = nullptr;
+
+	UPROPERTY()
+	UAbilitySystemComponent* OwnerGAS = nullptr;
+	FGameplayAbilitySpecHandle AttackAbilityHandle{};
 };

@@ -64,6 +64,9 @@ void AWeapon::OnBeginHit(UPrimitiveComponent* OverlappedComponent, AActor* Other
 	const auto OtherBaseAttributes = IAttributeHolder::Execute_GetBaseAttributes(OtherActor);
 	const auto Damage = UDamageCalculator::CalculateDamage(OwnerBaseAttributes, OtherBaseAttributes);
 	DamageComponent->Damage(Damage, OwnerCharacter);
+
+	// TODO: Attack attributes
+	// DamageComponent->KnockBack(500.f, OwnerCharacter);
 }
 
 // Called every frame

@@ -13,6 +13,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Gameplay/Character/Attribute/BaseAttributes.h"
+#include "Gameplay/Character/Attribute/BattleAttributes.h"
 
 DEFINE_LOG_CATEGORY(LogSurvivorCharacter);
 
@@ -67,6 +68,9 @@ void ASurvivorCharacter::BeginPlay()
 	{
 		BaseAttributes = AbilitySystemComponent->GetSet<UBaseAttributes>();
 		check(BaseAttributes);
+		
+		BattleAttributes = AbilitySystemComponent->GetSet<UBattleAttributes>();
+		check(BattleAttributes);
 	}
 
 	Super::BeginPlay();

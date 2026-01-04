@@ -9,6 +9,6 @@ float UDamageCalculator::CalculateDamage(const UBaseAttributes* AttackerAttribut
 	if (!AttackerAttributes || !DefenderAttributes) return 0;
 
 	const float Variant = FMath::RandRange(0.85f, 1.15f);
-	const float Damage = Variant * (FMath::Pow(AttackerAttributes->GetAttack(), 1.125f) / (1.0f + AttackerAttributes->GetDefence()));
-	return Damage;
+	const float Damage = Variant * (FMath::Pow(AttackerAttributes->GetAttack(), 1.25f) / (1.0f + AttackerAttributes->GetDefence()));
+	return FMath::RoundToFloat(Damage);
 }

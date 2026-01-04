@@ -5,11 +5,12 @@
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
+#include "Gameplay/GAS/Attribute/AttributeGlobal.h"
 #include "BaseAttributes.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogBaseGameplayAttribute, Log, All);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FBaseAttributeChangedDelegate, float, NewValue, float, OldValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAttributeChangedDelegate, float, NewValue, float, OldValue);
 
 /**
  * Character's base attributes.
@@ -28,15 +29,14 @@ public:
 	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;;
 
 	UPROPERTY(BlueprintAssignable, Category="Attributes")
-	FBaseAttributeChangedDelegate OnHealthChanged;
+	FAttributeChangedDelegate OnHealthChanged;
 	UPROPERTY(BlueprintAssignable, Category="Attributes")
-	FBaseAttributeChangedDelegate OnMaxHealthChanged;
+	FAttributeChangedDelegate OnMaxHealthChanged;
 	UPROPERTY(BlueprintAssignable, Category="Attributes")
-	FBaseAttributeChangedDelegate OnAttackChanged;
+	FAttributeChangedDelegate OnAttackChanged;
 	UPROPERTY(BlueprintAssignable, Category="Attributes")
-	FBaseAttributeChangedDelegate OnDefenceChanged;
+	FAttributeChangedDelegate OnDefenceChanged;
 
-protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayAttributeData Health;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

@@ -20,6 +20,12 @@ UTargetComponent::UTargetComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
+}
+
+void UTargetComponent::PostCDOContruct()
+{
+	Super::PostCDOContruct();
+
 	auto Owner = GetOwner();
 	if (!IsValid(Owner)) return; // Just skip.
 
@@ -28,7 +34,7 @@ UTargetComponent::UTargetComponent()
 		SphereComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 		SphereComponent->SetGenerateOverlapEvents(true);
 		SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnTargetEntered);
-		SphereComponent->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnTargetExited);
+		SphereComponent->OnComponentEndOverlap.AddDynamic(this, & ThisClass::OnTargetExited);
 		TargetRadius = SphereComponent;
 	}
 }

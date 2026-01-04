@@ -5,12 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayTagAssetInterface.h"
 #include "Gameplay/Character/Attribute/AttributeHolder.h"
-#include "Gameplay/Character/Attribute/BaseAttributes.h"
 #include "SurvivorCharacter.generated.h"
 
 class AWeapon;
-class UBaseAttributes;
 class UCameraComponent;
 class USpringArmComponent;
 class UCommandComponent;
@@ -73,6 +72,11 @@ public:
 	{
 		return BaseAttributes;
 	}
+
+	FORCEINLINE virtual const UBattleAttributes* GetBattleAttributes_Implementation() const override
+	{
+		return BattleAttributes;
+	}
 	
 	// --- IGameplayTagAssetInterface Implementation ---
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override 
@@ -90,9 +94,12 @@ protected:
 	virtual void OnAttributeChanged(const FOnAttributeChangeData& AttributeChangeData);
 
 private:
-	/** Base character's attribute Set. */
+	/** Base character's attributes. */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Attribute", meta = (AllowPrivateAccess = "true"))
 	const UBaseAttributes* BaseAttributes = nullptr;
+	/** Battle-related attribute set */
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Attribute", meta = (AllowPrivateAccess = "true"))
+	const UBattleAttributes* BattleAttributes = nullptr;
 
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
