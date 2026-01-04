@@ -60,6 +60,11 @@ void UTargetComponent::OnRegister()
 	AActor* OwnerActor = GetOwner();
 	if (!OwnerActor) return;
 
+	if (!TargetRadius)
+	{
+		TargetRadius = NewObject<USphereComponent>(OwnerActor, TEXT("Target Trigger"));
+	}
+
 	if (TargetRadius)
 	{
 		// Scene component must be attached to the actor's root component
@@ -69,6 +74,7 @@ void UTargetComponent::OnRegister()
 		);
 		TargetRadius->SetMobility(EComponentMobility::Movable);
 		TargetRadius->SetSphereRadius(TargetRange);
+		TargetRadius->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnTargetEntered);
 
 		// Call RegisterComponent() *only* if it hasn't been done elsewhere
 		// (If created in constructor, NewObject may have done initial setup)

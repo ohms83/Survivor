@@ -80,9 +80,4 @@ void ASurvivorCharacter::Tick(float DeltaSeconds)
 
 void ASurvivorCharacter::OnAttributeChanged(const FOnAttributeChangeData& AttributeChangeData)
 {
-	EventBaseAttributeChangedDelegate.Broadcast( {
-		AttributeChangeData.Attribute.GetName(),
-		AttributeChangeData.NewValue,
-		AttributeChangeData.OldValue
-	});
 }

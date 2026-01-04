@@ -3,13 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AttributeHelper.h"
 #include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
 #include "BaseAttributes.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogBaseGameplayAttribute, Log, All);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAttributeChangedDelegate, float, NewValue, float, OldValue);
 
 /**
  * Character's base attributes.

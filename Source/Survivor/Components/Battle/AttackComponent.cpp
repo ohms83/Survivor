@@ -40,8 +40,8 @@ void UAttackComponent::BeginPlay()
 
 	if (!IsValid(AttackAbility.Get()))
 	{
-		UE_LOG(LogAttackComponent, Error, TEXT("Invalid Attack Ability! Character=%s"),
-			*OwnerCharacter->GetName());
+		// UE_LOG(LogAttackComponent, Error, TEXT("Invalid Attack Ability! Character=%s"),
+		// 	*OwnerCharacter->GetName());
 		return;
 	}
 
@@ -116,8 +116,6 @@ void UAttackComponent::PerformAttack()
 
 	bIsAttacking = true;
 
-	// PlayAttackMontage(ComboCount++);
-	// if (AttackAbility)
 	if (!OwnerGAS)
 	{
 		UE_LOG(LogAttackComponent, Warning, TEXT("Actor (%s) doesn't implement IAbilitySystemInterface or never initialized UGameplayAbilitySystemComponent."),

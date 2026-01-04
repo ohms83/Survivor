@@ -74,12 +74,6 @@ public:
 		TagContainer = MyTags; 
 	}
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay|Tags")
-	FGameplayTagContainer MyTags;
-
-	UPROPERTY(BlueprintAssignable, Category="Attribute")
-	FOnAttributeValueChange EventBaseAttributeChangedDelegate;
-
 protected:
 	virtual void OnAttributeChanged(const FOnAttributeChangeData& AttributeChangeData);
 
@@ -100,5 +94,9 @@ protected:
 	UDamageComponent* DamageComponent = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UTargetComponent* TargetComponent = nullptr;
+	
+	// For IGameplayTagAssetInterface
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Gameplay|Tags", meta = (AllowPrivateAccess = "true"))
+	FGameplayTagContainer MyTags;
 };
 
