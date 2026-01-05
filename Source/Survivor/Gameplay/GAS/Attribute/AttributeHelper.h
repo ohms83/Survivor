@@ -6,14 +6,17 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayCueNotifyTypes.h"
 #include "AttributeHelper.generated.h"
 
 class UAttributeSet;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAttributeChangedDelegate, float, NewValue, float, OldValue);
 
+DECLARE_LOG_CATEGORY_EXTERN(LogAttributeHelper, Log, All);
+
 /**
- * 
+ * TODO: Rename to GASHelper.
  */
 UCLASS()
 class SURVIVOR_API UAttributeHelper : public UBlueprintFunctionLibrary
@@ -27,7 +30,7 @@ public:
 	 * @return A pointer to the requested attribute set or nullptr if not found. 
 	 */
 	UFUNCTION(BlueprintCallable, Category="AttributeHeler")
-	static const UAttributeSet* GetAttributeSet(const AActor* TargetActor, TSubclassOf<UAttributeSet> AttributeSetClass);
+	static const UAttributeSet* GetAttributeSet(AActor* TargetActor, TSubclassOf<UAttributeSet> AttributeSetClass);
 
 	/**
 	 * Get an attribute set of the specified type from the target actor.

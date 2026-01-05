@@ -2,13 +2,14 @@
 
 #include "AttributeHelper.h"
 
-const UAttributeSet* UAttributeHelper::GetAttributeSet(const AActor* TargetActor, TSubclassOf<UAttributeSet> AttributeSetClass)
+#include "AbilitySystemBlueprintLibrary.h"
+
+DEFINE_LOG_CATEGORY(LogAttributeHelper);
+
+const UAttributeSet* UAttributeHelper::GetAttributeSet(AActor* TargetActor, TSubclassOf<UAttributeSet> AttributeSetClass)
 {
-	const auto AbilitySystemInterface = Cast<IAbilitySystemInterface>(TargetActor);
-	if (!AbilitySystemInterface) return nullptr;
+	const auto AbilityComp = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	if (!AbilityComp) return nullptr;
 
-	const auto GasComp = AbilitySystemInterface->GetAbilitySystemComponent();
-	if (!GasComp) return nullptr;
-
-	return GasComp->GetAttributeSet(AttributeSetClass);
+	return AbilityComp->GetAttributeSet(AttributeSetClass);
 }

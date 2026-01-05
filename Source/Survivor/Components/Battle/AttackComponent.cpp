@@ -64,7 +64,7 @@ void UAttackComponent::PlayAttackMontage(const int32 Index)
 {
 	if (!AttackDataAsset)
 	{
-		UE_LOG(LogAttackComponent, Error, TEXT("Invalid AttackDataAsset!"));
+		// UE_LOG(LogAttackComponent, Error, TEXT("Invalid AttackDataAsset!"));
 		return;
 	}
 
@@ -110,7 +110,7 @@ void UAttackComponent::PerformAttack()
 	
 	if (!AttackDataAsset)
 	{
-		UE_LOG(LogAttackComponent, Error, TEXT("Invalid AttackDataAsset!"));
+		// UE_LOG(LogAttackComponent, Error, TEXT("Invalid AttackDataAsset!"));
 		return;
 	}
 

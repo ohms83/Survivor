@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
+class UGameplayEffect;
 class UBaseAttributes;
 class UGameplayAbility;
 class UTargetComponent;
@@ -36,6 +37,9 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Hit Box", meta = (AllowPrivateAccess = "true"))
 	UShapeComponent* HitBoxComponent = nullptr;
+	// TODO: The activating ability should provide this effect list.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Gameplay Effects", meta = (AllowPrivateAccess = "true"))
+	TArray<TSubclassOf<UGameplayEffect>> DamageEffects;
 
 	TObjectPtr<class ASurvivorCharacter> OwnerCharacter;
 	TObjectPtr<const UBaseAttributes> OwnerBaseAttributes;

@@ -3,10 +3,11 @@
 
 #include "Gameplay/Actors/Battle/Weapon.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "SurvivorCharacter.h"
 #include "Components/ShapeComponent.h"
-#include "Components/Battle/DamageComponent.h"
 #include "Components/Battle/TargetComponent.h"
+#include "Gameplay/GAS/Attribute/AttributeHelper.h"
 
 static const FName HurtBoxName = TEXT("HurtBox");
 
@@ -40,21 +41,26 @@ void AWeapon::OnBeginHit(UPrimitiveComponent* OverlappedComponent, AActor* Other
 {
 	if (!IsValid(OwnerCharacter)) return;
 	// Check whether the other actor can be a target.
-	if (const auto TargetComponent = OtherActor->GetComponentByClass<UTargetComponent>(); !TargetComponent->CanBeTarget(OwnerCharacter)) return;
+	if (const auto OtherTargetComponent = OtherActor->GetComponentByClass<UTargetComponent>(); !OtherTargetComponent->CanBeTarget(OwnerCharacter)) return;
 	// Check whether colliding with a hurt-box
 	if (!OtherComp->ComponentHasTag(HurtBoxName)) return;
+	
+	UAbilitySystemComponent* OwnerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OwnerCharacter);
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
 
-	auto DamageComponent = OtherActor->GetComponentByClass<UDamageComponent>();
-	if (!IsValid(DamageComponent)) return;
+	if (!IsValid(OwnerASC) || !IsValid(TargetASC)) return;
 
-	// TODO: Use gameplay effect.
-	// OwnerBaseAttributes = IAttributeHolder::Execute_GetBaseAttributes(OwnerCharacter);
-	// const auto OtherBaseAttributes = IAttributeHolder::Execute_GetBaseAttributes(OtherActor);
-	// const auto Damage = UDamageCalculator::CalculateDamage(OwnerBaseAttributes, OtherBaseAttributes);
-	// DamageComponent->Damage(Damage, OwnerCharacter);
+	for (const auto& Effect : DamageEffects)
+	{
+		FGameplayEffectContextHandle ContextHandle = OwnerASC->MakeEffectContext();
+		ContextHandle.AddInstigator(OwnerCharacter, OwnerCharacter);
 
-	// TODO: Attack attributes
-	// DamageComponent->KnockBack(500.f, OwnerCharacter);
+		if (FGameplayEffectSpecHandle SpecHandle = OwnerASC->MakeOutgoingSpec(Effect, 1.0f, ContextHandle); SpecHandle.IsValid())
+		{
+			// 3. Apply the Effect to the Target
+			OwnerASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+		}	
+	}
 }
 
 // Called every frame
